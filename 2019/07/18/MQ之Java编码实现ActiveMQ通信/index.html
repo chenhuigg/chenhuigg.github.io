@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="陈辉的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+	<title>MQ之Java编码实现ActiveMQ通信</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?awwssw1snsnsnn1ndndnndnd99j";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">陈辉的博客-填坑日记</a>
+  <a class="face-img" href="/">
+    <img src="https://tva3.sinaimg.cn/crop.0.0.200.200.180/005Kc3C1jw8f2uep0hhkvj305k05k3yk.jpg">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    MQ之Java编码实现ActiveMQ通信
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2019-07-17T16:58:36.000Z" itemprop="datePublished">2019-07-18</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-07-17T17:06:58.334Z" itemprop="dateUpdated">2019-07-18</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <h3 id="Java编码实现ActiveMQ通信"><a href="#Java编码实现ActiveMQ通信" class="headerlink" title="Java编码实现ActiveMQ通信"></a>Java编码实现ActiveMQ通信</h3><hr>
+<p>1、IDEA新建Maven工程</p>
+<p>2、POM.xml文件</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">    &lt;!-- activemq 相关maven依赖 --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;javax.jms&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;jms&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;1.1&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.activemq&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;activemq-core&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;5.5.0&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.apache.activemq&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;activemq-pool&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;5.7.0&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- 日志相关依赖 --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.slf4j&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;slf4j-api&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;1.6.1&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.slf4j&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;1.6.1&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;log4j&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;log4j&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;1.2.16&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
+
+<p>3、JMS编码总体架构</p>
+<p><img src="/2019/07/18/MQ之Java编码实现ActiveMQ通信/clipboard.png" alt="img"></p>
+<p>由Connection工厂获得了连接，由连接再获得了Session，Session可以创建消息，消息可以发送到目的地Destination（队列和主题）</p>
+<p><br><br></p>
+<h3 id="目的地的两种模式特性"><a href="#目的地的两种模式特性" class="headerlink" title="目的地的两种模式特性"></a>目的地的两种模式特性</h3><hr>
+<p>两大模式为队列和主题</p>
+<p><img src="/2019/07/18/MQ之Java编码实现ActiveMQ通信/clipboard1.png" alt="img"></p>
+<p>在点对点的消息传递域中，目的地被称为队列（queue）</p>
+<p>在发布订阅消息传递域中，目的地被称为主题（topic）</p>
+<p><br><br></p>
+<h3 id="消息生产者编码"><a href="#消息生产者编码" class="headerlink" title="消息生产者编码"></a>消息生产者编码</h3><hr>
+<p>ActiveMQ的构造方法有以下几个</p>
+<p><img src="/2019/07/18/MQ之Java编码实现ActiveMQ通信/clipboard2.png" alt="img"></p>
+<p>默认情况下，它使用默认的用户名、密码和连接，我们也可以为其单独设置。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String ACTIVEMQ_URL=<span class="string">"tcp://127.0.0.1:61616"</span>;</span><br><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String QUEUE_NAME=<span class="string">"queue01"</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> JMSException </span>&#123;</span><br><span class="line">    <span class="comment">//1、创建连接工厂</span></span><br><span class="line">    ActiveMQConnectionFactory factory=<span class="keyword">new</span> ActiveMQConnectionFactory(ACTIVEMQ_URL);</span><br><span class="line">    <span class="comment">//2、通过连接工厂，获得连接Connection并启动访问</span></span><br><span class="line">    Connection connection = factory.createConnection();</span><br><span class="line">    connection.start();</span><br><span class="line">    <span class="comment">//3、创建会话Session</span></span><br><span class="line">    <span class="comment">//两个参数：事务、签收</span></span><br><span class="line">    Session session = connection.createSession(<span class="keyword">false</span>, Session.AUTO_ACKNOWLEDGE);</span><br><span class="line">    <span class="comment">//4、创建目的地（队列或主题）</span></span><br><span class="line">    Queue queue = session.createQueue(QUEUE_NAME);</span><br><span class="line">    <span class="comment">//5、创建消息的生产者</span></span><br><span class="line">    MessageProducer producer = session.createProducer(queue);</span><br><span class="line">    <span class="comment">//6、通过使用MessageProducer生产3条消息发送到MQ的队列中</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)&#123;</span><br><span class="line">        <span class="comment">//7、创建消息</span></span><br><span class="line">        TextMessage textMessage = session.createTextMessage(<span class="string">"message"</span> + i);<span class="comment">//理解为一个字符串</span></span><br><span class="line">        <span class="comment">//8、通过MessageProducer发送给MQ</span></span><br><span class="line">        producer.send(textMessage);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//9、关闭资源</span></span><br><span class="line">    producer.close();</span><br><span class="line">    session.close();</span><br><span class="line">    connection.close();</span><br><span class="line">    System.out.println(<span class="string">"********消息发布到MQ完成******"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过访问浏览器，我们可以查看下面的结果</p>
+<p><img src="/2019/07/18/MQ之Java编码实现ActiveMQ通信/clipboard3.png" alt="img"></p>
+<p>使用浏览器对其翻译进行查看</p>
+<p><img src="/2019/07/18/MQ之Java编码实现ActiveMQ通信/clipboard4.png" alt="img"></p>
+<p>控制台说明</p>
+<table>
+<thead>
+<tr>
+<th>Number Of Pending Messages</th>
+<th>等待消费的消息</th>
+<th>当前未出队列的数量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Number Of Consumers</td>
+<td>消费者数量</td>
+<td>消费者端的消费者数量</td>
+</tr>
+<tr>
+<td>Messages Enqueued</td>
+<td>已进队消息数</td>
+<td>进入队列的总数量，包括出队列的，这个数量只增不减</td>
+</tr>
+<tr>
+<td>Messages Dequeued</td>
+<td>出队消息数</td>
+<td>可以理解为是消费者消费掉的数量</td>
+</tr>
+</tbody></table>
+<p>总结：</p>
+<p>当有一个消息进入这个队列时，等待消费的消息是1，进入队列的消息是1。</p>
+<p>当消息消费后，等待消费的消息是0，进入队列的消息是1，出队列的消息是1。</p>
+<p>再来一条消息时，等待消费的消息是1，进入队列的消息是2。</p>
+<p><br><br></p>
+<h3 id="消息消费者编码"><a href="#消息消费者编码" class="headerlink" title="消息消费者编码"></a>消息消费者编码</h3><hr>
+<p><strong>通过同步阻塞的方式消费消息</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String ACTIVEMQ_URL=<span class="string">"tcp://127.0.0.1:61616"</span>;</span><br><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String QUEUE_NAME=<span class="string">"queue01"</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> JMSException </span>&#123;</span><br><span class="line">    ActiveMQConnectionFactory factory=<span class="keyword">new</span> ActiveMQConnectionFactory(ACTIVEMQ_URL);</span><br><span class="line">    Connection connection = factory.createConnection();</span><br><span class="line">    connection.start();</span><br><span class="line">    Session session = connection.createSession(<span class="keyword">false</span>, Session.AUTO_ACKNOWLEDGE);</span><br><span class="line">    Queue queue = session.createQueue(QUEUE_NAME);</span><br><span class="line">    <span class="comment">//创建消息的消费者</span></span><br><span class="line">    MessageConsumer consumer = session.createConsumer(queue);</span><br><span class="line">    <span class="comment">//同步阻塞方法（receive()）</span></span><br><span class="line">    <span class="comment">//订阅者或者接收者调用该方法来接收消息，receive方法在能够接收到消息之前（或超时之前）将一直阻塞</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line">        <span class="comment">//Message message = consumer.receive();</span></span><br><span class="line">        <span class="comment">//由于发送的是TextMessage，因此需要强制类型转换</span></span><br><span class="line">        TextMessage message= (TextMessage) consumer.receive();</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">null</span>!=message)&#123;</span><br><span class="line">            System.out.println(<span class="string">"******消费者接收消息："</span>+message.getText());</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    consumer.close();</span><br><span class="line">    session.close();</span><br><span class="line">    connection.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时，再次通过浏览器进行查看，数量已经发生了变化。</p>
+<p><img src="/2019/07/18/MQ之Java编码实现ActiveMQ通信/clipboard5.png" alt="img"></p>
+<p><strong>消息消费者receive方法说明</strong></p>
+<p>上面接收消息时所使用的receive方法，在消费完消息后，仍然保持着连接的状态，其还有一个重载方法，带有long类型的参数，表示当超过设置的时间没有收到消息，那么就会自动断开连接。</p>
+<p><strong>通过异步非阻塞的方式（监听的方式）来消费消息</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String ACTIVEMQ_URL=<span class="string">"tcp://127.0.0.1:61616"</span>;</span><br><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String QUEUE_NAME=<span class="string">"queue01"</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> JMSException, IOException </span>&#123;</span><br><span class="line">    ActiveMQConnectionFactory factory=<span class="keyword">new</span> ActiveMQConnectionFactory(ACTIVEMQ_URL);</span><br><span class="line">    Connection connection = factory.createConnection();</span><br><span class="line">    connection.start();</span><br><span class="line">    Session session = connection.createSession(<span class="keyword">false</span>, Session.AUTO_ACKNOWLEDGE);</span><br><span class="line">    Queue queue = session.createQueue(QUEUE_NAME);</span><br><span class="line">    <span class="comment">//创建消息的消费者</span></span><br><span class="line">    MessageConsumer consumer = session.createConsumer(queue);</span><br><span class="line">    <span class="comment">/*通过阻塞的方式消费消息</span></span><br><span class="line"><span class="comment">    while (true)&#123;</span></span><br><span class="line"><span class="comment">        //Message message = consumer.receive();</span></span><br><span class="line"><span class="comment">        //由于发送的是TextMessage，因此需要强制类型转换</span></span><br><span class="line"><span class="comment">        TextMessage message= (TextMessage) consumer.receive();</span></span><br><span class="line"><span class="comment">        if(null!=message)&#123;</span></span><br><span class="line"><span class="comment">            System.out.println("******消费者接收消息："+message.getText());</span></span><br><span class="line"><span class="comment">        &#125;else&#123;</span></span><br><span class="line"><span class="comment">            break;</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">    &#125;*/</span></span><br><span class="line">    <span class="comment">//通过监听的方式来消费消息</span></span><br><span class="line">    consumer.setMessageListener(<span class="keyword">new</span> MessageListener() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onMessage</span><span class="params">(Message message)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">null</span>!=message&amp;&amp;message <span class="keyword">instanceof</span> TextMessage)&#123;</span><br><span class="line">                TextMessage textMessage= (TextMessage) message;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    System.out.println(<span class="string">"******消费者接收消息："</span>+textMessage.getText());</span><br><span class="line">                &#125; <span class="keyword">catch</span> (JMSException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">//保证控制台不灭，防止未消费就被关闭</span></span><br><span class="line">    System.in.read();</span><br><span class="line">    consumer.close();</span><br><span class="line">    session.close();</span><br><span class="line">    connection.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><br><br></p>
+<h3 id="JMS开发的基本步骤"><a href="#JMS开发的基本步骤" class="headerlink" title="JMS开发的基本步骤"></a>JMS开发的基本步骤</h3><hr>
+<p>1、创建一个connection factory</p>
+<p>2、通过connection factory来创建JMS connection</p>
+<p>3、启动JMS connection</p>
+<p>4、通过connection创建JMS session</p>
+<p>5、创建JMS destination</p>
+<p>6、创建JMS producer或者创建JMS message并设置destination</p>
+<p>7、创建JMS consumer或者是注册一个JMS message listener</p>
+<p>8、发送或者接受JMS message</p>
+<p>9、关闭所有的JMS资源</p>
+<p><br><br></p>
+<h3 id="点对点消息传递域的特点"><a href="#点对点消息传递域的特点" class="headerlink" title="点对点消息传递域的特点"></a>点对点消息传递域的特点</h3><hr>
+<p>1、每个消息只能有一个消费者，类似1对1的关系。</p>
+<p>2、消息的生产者和消费者之间没有时间上的相关性。无论消费者在生产者发送消息的时候是否处于运行状态，消费者都可以提取消息。</p>
+<p>3、消息被消费后队列中不会再存储，所有消费者不会消费到已经被消费掉的消息。</p>
+<p><br><br></p>
+<h3 id="发布订阅消息传递域的特点"><a href="#发布订阅消息传递域的特点" class="headerlink" title="发布订阅消息传递域的特点"></a>发布订阅消息传递域的特点</h3><hr>
+<p>1、生产者将消息发布到topic中，每个消息可以有多个消费者，属于1：N的关系。</p>
+<p>2、生产者和消费者没有时间上的相关性。</p>
+<p>3、生产者生产时，topic不保存消息它是无状态的不落地，假如无人订阅就去生产，那就是一条废消息，所以，一般先启动消费者再启动生产者。</p>
+<p>JMS规范允许客户创建持久订阅，这在一定程度上放松了时间上的相关性要求。持久订阅允许消费者在未处于激活状态时发送消息。</p>
+<p><br><br></p>
+<h3 id="发布主题生产者"><a href="#发布主题生产者" class="headerlink" title="发布主题生产者"></a>发布主题生产者</h3><hr>
+<p>目的地为主题的生产者代码与目的为队列的生产者相差无几</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String ACTIVEMQ_URL=<span class="string">"tcp://127.0.0.1:61616"</span>;</span><br><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String TOPIC_NAME=<span class="string">"topic01"</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> JMSException </span>&#123;</span><br><span class="line">    ActiveMQConnectionFactory factory=<span class="keyword">new</span> ActiveMQConnectionFactory(ACTIVEMQ_URL);</span><br><span class="line">    Connection connection = factory.createConnection();</span><br><span class="line">    connection.start();</span><br><span class="line">    Session session = connection.createSession(<span class="keyword">false</span>, Session.AUTO_ACKNOWLEDGE);</span><br><span class="line">    <span class="comment">//创建主题</span></span><br><span class="line">    Topic topic = session.createTopic(TOPIC_NAME);</span><br><span class="line">    <span class="comment">//创建消息的生产者</span></span><br><span class="line">    MessageProducer producer = session.createProducer(topic);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)&#123;</span><br><span class="line">        TextMessage textMessage = session.createTextMessage(<span class="string">"Topic Message:"</span> + i);</span><br><span class="line">        producer.send(textMessage);</span><br><span class="line">    &#125;</span><br><span class="line">    producer.close();</span><br><span class="line">    session.close();</span><br><span class="line">    connection.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><br><br></p>
+<h3 id="订阅主题消费者"><a href="#订阅主题消费者" class="headerlink" title="订阅主题消费者"></a>订阅主题消费者</h3><hr>
+<p>如果先启动订阅，再生产消息，每一位订阅主题的消费者都会收到消息。</p>
+<p>如果先生产消息，再启动订阅，那么订阅者将无法收到已生产的消息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String ACTIVEMQ_URL=<span class="string">"tcp://127.0.0.1:61616"</span>;</span><br><span class="line"><span class="keyword">public</span>  <span class="keyword">static</span>  <span class="keyword">final</span> String TOPIC_NAME=<span class="string">"topic01"</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> JMSException, IOException </span>&#123;</span><br><span class="line">    ActiveMQConnectionFactory factory=<span class="keyword">new</span> ActiveMQConnectionFactory(ACTIVEMQ_URL);</span><br><span class="line">    Connection connection = factory.createConnection();</span><br><span class="line">    connection.start();</span><br><span class="line">    Session session = connection.createSession(<span class="keyword">false</span>, Session.AUTO_ACKNOWLEDGE);</span><br><span class="line">    <span class="comment">//创建主题</span></span><br><span class="line">    Topic topic = session.createTopic(TOPIC_NAME);</span><br><span class="line">    <span class="comment">//创建消费者</span></span><br><span class="line">    MessageConsumer consumer = session.createConsumer(topic);</span><br><span class="line">    <span class="comment">//使用Lambda表达式的形式</span></span><br><span class="line">    consumer.setMessageListener(message-&gt;&#123;</span><br><span class="line">        TextMessage textMessage= (TextMessage) message;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"*****消费者消费Topic消息："</span>+textMessage.getText());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (JMSException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    System.in.read();</span><br><span class="line">    consumer.close();</span><br><span class="line">    session.close();</span><br><span class="line">    connection.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+          <a href="https://chenhuigg.github.io" target="_blank">关于转载请看这里</a>
+            <!--<a class="btn-pay"  href="#pay-modal">¥ 打赏支持</a>-->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          
+
+        </div>
+      </div>
+    </div>
+   
+</main>
+<div class="footer">
+  <div class="info">
+    <p>
+    
+    </p><p>&copy;2015-2019 陈辉的博客</p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = true;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>

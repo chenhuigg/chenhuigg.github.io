@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="陈辉的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+	<title>MQ之消息中间件ActiveMQ</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?awwssw1snsnsnn1ndndnndnd99j";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">陈辉的博客-填坑日记</a>
+  <a class="face-img" href="/">
+    <img src="https://tva3.sinaimg.cn/crop.0.0.200.200.180/005Kc3C1jw8f2uep0hhkvj305k05k3yk.jpg">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    MQ之消息中间件ActiveMQ
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2019-07-17T16:49:14.000Z" itemprop="datePublished">2019-07-18</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-07-17T16:57:07.668Z" itemprop="dateUpdated">2019-07-18</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <h3 id="为什么引入消息中间件"><a href="#为什么引入消息中间件" class="headerlink" title="为什么引入消息中间件"></a>为什么引入消息中间件</h3><hr>
+<p>微服务架构后，链式调用是我们在写程序时候的一般流程，为了完成一个整体功能会将其拆分成多个子模块，比如模块A调用模块B，模块B调用模块C，模块C调用模块D。但在大型分布式应用中，系统间的RPC交互繁杂。</p>
+<p>它带来了以下几个问题</p>
+<p><strong>系统之间接口耦合比较严重（需要解耦）</strong></p>
+<p>每增加一个下游功能，都要对上游的相关接口进行改造。</p>
+<p><strong>面对大流量并发时，容易被冲垮（需要削峰）</strong></p>
+<p>每个接口的模块的吞吐能力是有限的，这个上限能力如果堤坝，当大流量来临时，容易被冲垮。</p>
+<p>例如上游系统发起下单购买操作，下单操作完成的业务逻辑（读取订单，库存检查，库存冻结，余额检查，余额冻结，订单生成，余额扣减，库存扣减，生成流水，余额解冻，库存解冻）</p>
+<p><strong>等待同步存在性能问题（需要异步）</strong></p>
+<p>RPC接口基本上是同步调用，整体的服务性能遵循“木桶理论”，即整个整个系统的耗时取决于链路中最慢的那个接口。</p>
+<p><br><br></p>
+<h3 id="消息中间件是什么"><a href="#消息中间件是什么" class="headerlink" title="消息中间件是什么"></a>消息中间件是什么</h3><hr>
+<p>利用高效可靠的消息传递机制进行与平台无关的数据交流，通过提供消息传递和消息排队模型在分布式环境下提供应用解耦、弹性伸缩、冗余存储、流量削峰、异步通信、数据同步等功能。</p>
+<br>
+
+<p>大致的过程是这样的：</p>
+<p>发送者把消息发送给消息服务器，消息服务器将消息存放在若干队列/主题中，在合适的时候，消息服务器会将消息转发给接受者，在这个过程中，发送和接收是异步的，也就是发送无需等待，并且发送者和接受者的生命周期也没有必然关系；尤其在发布pub/订阅sub模式下，也可以完成一对多的消息通信。</p>
+<p><br><br></p>
+<h3 id="消息中间件的特点"><a href="#消息中间件的特点" class="headerlink" title="消息中间件的特点"></a>消息中间件的特点</h3><hr>
+<p><strong>采用异步处理模式</strong></p>
+<p>消息发送者可以发送一个消息而无需等待响应。消息发送者将消息发送到一条虚拟的通道上，消息接受者则订阅或监听该通道。一条信息可能最终转发给一个或多个消息接受者，这些接收则都无需对消息发送者做出同步回应。整个过程都是异步的。</p>
+<p><strong>应用系统之间解耦合</strong></p>
+<p>发送者和接受者不必了解对方，只需确认消息。</p>
+<p>发送者和接受者不必同时在线。</p>
+<p><br><br></p>
+<h3 id="下载ActiveMQ"><a href="#下载ActiveMQ" class="headerlink" title="下载ActiveMQ"></a>下载ActiveMQ</h3><hr>
+<p>ActiveMQ官网：<a href="http://activemq.apache.org/" target="_blank" rel="noopener">http://activemq.apache.org/</a></p>
+<p><br><br></p>
+<h3 id="安装ActiveMQ"><a href="#安装ActiveMQ" class="headerlink" title="安装ActiveMQ"></a>安装ActiveMQ</h3><hr>
+<p>1、将下载的ActiveMQ压缩文件放在Linux的/opt目录下</p>
+<p>2、解压缩ActiveMQ文件 tar  -zxvf  ActiveMQ文件名</p>
+<p>3、在根目录下mkdir /myactivemq</p>
+<p>4、将解压缩后的文件放入到myactivemq，cp -r  ActivwMQ文件  /myactivemq</p>
+<p><br><br></p>
+<h3 id="普通启动ActiveMQ"><a href="#普通启动ActiveMQ" class="headerlink" title="普通启动ActiveMQ"></a>普通启动ActiveMQ</h3><hr>
+<p>进入到ActiveMQ的bin目录，输入如下命令启动ActiveMQ</p>
+<p><code>./activemq start</code></p>
+<p><img src="/2019/07/18/MQ之消息中间件ActiveMQ/clipboard.png" alt="img"></p>
+<p>判断ActiveMQ是否启动：ActiveMQ的默认后台进程端口是61616</p>
+<p>通过 ps -ef|grep activemq查看进程的端口号</p>
+<p><img src="/2019/07/18/MQ之消息中间件ActiveMQ/clipboard1.png" alt="img"></p>
+<p>或者通过lsof -i:61616查看</p>
+<p><img src="/2019/07/18/MQ之消息中间件ActiveMQ/clipboard2.png" alt="img"></p>
+<p><br><br></p>
+<h3 id="普通关闭ActiveMQ"><a href="#普通关闭ActiveMQ" class="headerlink" title="普通关闭ActiveMQ"></a>普通关闭ActiveMQ</h3><hr>
+<p>使用 <code>./activemq stop</code>命令进行关闭</p>
+<p><img src="/2019/07/18/MQ之消息中间件ActiveMQ/clipboard3.png" alt="img"></p>
+<p><br><br></p>
+<h3 id="带运行日志的启动方式"><a href="#带运行日志的启动方式" class="headerlink" title="带运行日志的启动方式"></a>带运行日志的启动方式</h3><hr>
+<p><code>./activemq start &gt; /myactivemq/run_activemq.log</code></p>
+<p>这样ActiveMQ的每一步执行都会被追加写入日志中</p>
+<p><img src="/2019/07/18/MQ之消息中间件ActiveMQ/clipboard4.png" alt="img"></p>
+<p>这样的启动它是没有提示的，它的提示将会被写入到指定的文件中。</p>
+<p><br><br></p>
+<h3 id="ActiveMQ安装后的控制台访问"><a href="#ActiveMQ安装后的控制台访问" class="headerlink" title="ActiveMQ安装后的控制台访问"></a>ActiveMQ安装后的控制台访问</h3><hr>
+<p>默认控制台访问 <a href="http://192.168.111.136:8161/admin/" target="_blank" rel="noopener">http://127.0.0.1:8161/admin/</a></p>
+<p>默认的用户名和密码是 admin/admin</p>
+<p><img src="/2019/07/18/MQ之消息中间件ActiveMQ/clipboard5.png" alt="img"></p>
+<p>ActiveMQ采用61616端口提供JMS服务</p>
+<p>采用8161端口提供管理控制台服务</p>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+          <a href="https://chenhuigg.github.io" target="_blank">关于转载请看这里</a>
+            <!--<a class="btn-pay"  href="#pay-modal">¥ 打赏支持</a>-->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          
+
+        </div>
+      </div>
+    </div>
+   
+</main>
+<div class="footer">
+  <div class="info">
+    <p>
+    
+    </p><p>&copy;2015-2019 陈辉的博客</p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = true;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
