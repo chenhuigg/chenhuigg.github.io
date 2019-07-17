@@ -273,7 +273,7 @@ if (overdueRemindText && overdueRemindDom) {
 
 var navMenu = document.getElementById('nav-menu');
 var searchContainer = document.querySelector('.search');
-navMenu.addEventListener('click', () => {
+/*navMenu.addEventListener('click', () => {
   var leftAside = document.querySelector('.left-aside');
   var rightAside = document.querySelector('.right-aside');
   var rightMain = document.querySelector('.right-main');
@@ -285,15 +285,16 @@ navMenu.addEventListener('click', () => {
     rightMain.style.margin = '65px auto';
     rightMain.style.width = '800px';
   };
-});
+});*/
 
 var navSearch = document.getElementById('nav-search');
 var searchBox = document.querySelector('.search-box');
-navSearch.addEventListener('mouseover', () => {
+/*navSearch.addEventListener('mouseover', () => {
   navSearch.style.display = 'none';
   if (searchBox) { searchBox.style.display = 'block';}
   search.focus();
 });
+
 
 search.addEventListener('blur', (event) => {
   navSearch.style.display = 'block';
@@ -301,8 +302,7 @@ search.addEventListener('blur', (event) => {
   search.value = '';
   hiddenSearchResultBox();
 });
-
-
+*/
 
 /***/ }),
 
