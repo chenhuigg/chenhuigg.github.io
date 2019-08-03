@@ -271,13 +271,13 @@ if (overdueRemindText && overdueRemindDom) {
   overdueRemindDom.innerHTML = overdueRemindText.replace(/\$day/, '<span> ' + dayNum + ' </span>');
 }
 
-/*var navMenu = document.getElementById('nav-menu');
+var navMenu = document.getElementById('nav-menu');
 var searchContainer = document.querySelector('.search');
 navMenu.addEventListener('click', () => {
   var leftAside = document.querySelector('.left-aside');
   var rightAside = document.querySelector('.right-aside');
   var rightMain = document.querySelector('.right-main');
-  if (leftAside) { leftAside.style.display = 'none'}
+  if (leftAside) { leftAside.style.display ='none'}
   if (rightAside) { rightAside.style.marginLeft = 'unset'}
   if (searchContainer) {searchContainer.style.right = '70px';}
   if (rightMain) {
@@ -287,6 +287,7 @@ navMenu.addEventListener('click', () => {
   };
 });
 
+/*
 var navSearch = document.getElementById('nav-search');
 var searchBox = document.querySelector('.search-box');
 navSearch.addEventListener('mouseover', () => {
