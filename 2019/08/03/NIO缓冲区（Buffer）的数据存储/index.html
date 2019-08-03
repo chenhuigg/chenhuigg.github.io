@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="陈辉的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/img/favicon.ico" title="Favicon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+	<title>NIO缓冲区（Buffer）的数据存储</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?awwssw1snsnsnn1ndndnndnd99j";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+	<svg id="nav-menu" class="icon icon-menu" aria-hidden="true">
+		<use xlink:href="#icon-menu"/>
+	</svg>
+  <a class="blog-title" href="/">陈辉的博客-填坑日记</a>
+  <a class="face-img" href="/">
+    <img src="https://tva3.sinaimg.cn/crop.0.0.200.200.180/005Kc3C1jw8f2uep0hhkvj305k05k3yk.jpg">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    NIO缓冲区（Buffer）的数据存储
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2019-08-03T15:19:40.000Z" itemprop="datePublished">2019-08-03</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-03T15:28:44.434Z" itemprop="dateUpdated">2019-08-03</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <h2 id="缓冲区"><a href="#缓冲区" class="headerlink" title="缓冲区"></a>缓冲区</h2><p>缓冲区（Buffer）在Java NIO中负责数据的存储。缓冲区就是数组。用于存储不同数据类型的数组。</p>
+<p>根据数据类型不同（boolean类型除外），提供了对应类型的缓冲区。</p>
+<p>ByteBuffer（常用）、CharBuffer、ShortBuffer、IntBuffer、LongBuffer、FloatBuffer、DoubleBuffer</p>
+<p>上述缓冲区管理方式几乎一致，都是通过allocate()获取缓冲区。</p>
+<p><br><br></p>
+<h2 id="缓冲区存取数据的两个核心方法"><a href="#缓冲区存取数据的两个核心方法" class="headerlink" title="缓冲区存取数据的两个核心方法"></a>缓冲区存取数据的两个核心方法</h2><p>put() ：存入数据到缓冲区中</p>
+<p>get() ：获取缓冲区中的数据</p>
+<p><br><br></p>
+<h2 id="缓冲区中的四个核心属性"><a href="#缓冲区中的四个核心属性" class="headerlink" title="缓冲区中的四个核心属性"></a>缓冲区中的四个核心属性</h2><p>capacity：容量，表示缓冲区中最大存储容量，一旦声明，不能改变。</p>
+<p>limit：界限，表示缓冲区中可以操作数据的大小。（limit后面的数据不能进行读写）</p>
+<p>position：位置，表示缓冲区中正在操作数据的位置。position&lt;=limit&lt;=capacity</p>
+<p>mark：标记，表示记录当前position的位置，可以通过reset()恢复到刚才mark的位置</p>
+<p><br><br></p>
+<h2 id="缓冲区读取数据"><a href="#缓冲区读取数据" class="headerlink" title="缓冲区读取数据"></a>缓冲区读取数据</h2><p><strong>1.分配一个指定大小的缓冲区</strong></p>
+<p>1、最大容量为1024</p>
+<p>2、界限为1024</p>
+<p>3、位置为0</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer buffer=ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">syso(buffer.position());</span><br><span class="line">syso(buffer.limit());</span><br><span class="line">syso(buffer.capacity());</span><br><span class="line">syso(<span class="string">"-------------------------"</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.利用put方法存入数据到缓冲区中去</strong></p>
+<p>1、最大容量为1024</p>
+<p>2、界限为1024</p>
+<p>3、位置为5</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">buffer.put(<span class="string">"abcde"</span>.getBytes());</span><br><span class="line">syso(buffer.position());</span><br><span class="line">syso(buffer.limit());</span><br><span class="line">syso(buffer.capacity());</span><br><span class="line">syso(<span class="string">"-------------------------"</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.通过flip方法切换到读数据模式</strong></p>
+<p>1、最大容量为1024</p>
+<p>2、界限为5</p>
+<p>3、位置为0</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">buffer.flip();</span><br><span class="line">syso(buffer.position());</span><br><span class="line">syso(buffer.limit());</span><br><span class="line">syso(buffer.capacity());</span><br><span class="line">syso(<span class="string">"-------------------------"</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.利用get方法读取缓冲区中的数据</strong></p>
+<p>1、最大容量为1024</p>
+<p>2、界限为5</p>
+<p>3、位置为5</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">byte</span> [] by=<span class="keyword">new</span> <span class="keyword">byte</span>[buffer.limit()];</span><br><span class="line">buffer.get(by);</span><br><span class="line">syso(<span class="keyword">new</span> String(by,<span class="number">0</span>,by.length));</span><br><span class="line">syso(buffer.position());</span><br><span class="line">syso(buffer.limit());</span><br><span class="line">syso(buffer.capacity());</span><br><span class="line">syso(<span class="string">"-------------------------"</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>5.利用rewind重复读数据</strong></p>
+<p>1、最大容量为1024</p>
+<p>2、界限为5</p>
+<p>3、位置为0</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">buffer.rewind();</span><br><span class="line">syso(buffer.position());</span><br><span class="line">syso(buffer.limit());</span><br><span class="line">syso(buffer.capacity());</span><br><span class="line">syso(<span class="string">"-------------------------"</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>6.清空缓冲区,缓冲区中数据还在，数据处于被遗忘状态</strong></p>
+<p>1、最大容量为1024</p>
+<p>2、界限为1024</p>
+<p>3、位置为0</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">buffer.clear();</span><br><span class="line">syso(buffer.position());</span><br><span class="line">syso(buffer.limit());</span><br><span class="line">syso(buffer.capacity());</span><br><span class="line">syso(<span class="string">"-------------------------"</span>);</span><br></pre></td></tr></table></figure>
+
+<p><br><br></p>
+<h2 id="缓冲区mark（标记）的使用"><a href="#缓冲区mark（标记）的使用" class="headerlink" title="缓冲区mark（标记）的使用"></a>缓冲区mark（标记）的使用</h2><p>mark()方法用于标记当前position位置</p>
+<p>reset()方法将position恢复到标记的位置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//存入数据"abcde"</span></span><br><span class="line">String string=<span class="string">"abcde"</span>;</span><br><span class="line">ByteBuffer buffer=ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">buffer.put(string.getBytes());</span><br><span class="line"><span class="comment">//切换到读取模式</span></span><br><span class="line">buffer.flip();</span><br><span class="line"><span class="keyword">byte</span> [] by=<span class="keyword">new</span> <span class="keyword">byte</span>[buffer.limit()];</span><br><span class="line">buffer.get(by,<span class="number">0</span>,<span class="number">2</span>);</span><br><span class="line">syso(buffer.position());<span class="comment">//结果2</span></span><br><span class="line"><span class="comment">//mark 标记</span></span><br><span class="line">buffer.mark();</span><br><span class="line">buffer.get(by,<span class="number">2</span>,<span class="number">2</span>);</span><br><span class="line">syso(buffer.position());<span class="comment">//结果4</span></span><br><span class="line"><span class="comment">//通过reset恢复到mark位置</span></span><br><span class="line">buffer.reset();</span><br><span class="line">syso(buffer.position());<span class="comment">//结果2</span></span><br></pre></td></tr></table></figure>
+
+<p><br><br></p>
+<h2 id="Buffer的slice方法"><a href="#Buffer的slice方法" class="headerlink" title="Buffer的slice方法"></a>Buffer的slice方法</h2><p>通过slice方法创建的sliceBuffer它们共同的数据只有一份，通过原有Buffer或sliceBuffer的修改会反映在另外一个Buffer上。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer byteBuffer=ByteBuffer.allocate(<span class="number">10</span>);</span><br><span class="line"><span class="comment">//放入数据到byteBuffer</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i&lt; byteBuffer.capacity(); ++i)&#123;</span><br><span class="line">    byteBuffer.put((<span class="keyword">byte</span>)i);</span><br><span class="line">&#125;</span><br><span class="line">byteBuffer.position(<span class="number">2</span>);</span><br><span class="line">byteBuffer.limit(<span class="number">6</span>);</span><br><span class="line"><span class="comment">//创建sliceBuffer，修改sliceBuffer上的值为原来的2倍</span></span><br><span class="line">ByteBuffer sliceBuffer=byteBuffer.slice();</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;sliceBuffer.capacity();++i)&#123;</span><br><span class="line">    <span class="keyword">byte</span> b = sliceBuffer.get(i);</span><br><span class="line">    sliceBuffer.put(i, (<span class="keyword">byte</span>) (<span class="number">2</span>*b));</span><br><span class="line">&#125;</span><br><span class="line">byteBuffer.position(<span class="number">0</span>);</span><br><span class="line">byteBuffer.limit(byteBuffer.capacity());</span><br><span class="line"><span class="comment">//查看byteBuffer上的值的变化</span></span><br><span class="line"><span class="keyword">while</span>(byteBuffer.hasRemaining())&#123;</span><br><span class="line">    System.out.println(byteBuffer.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序运行结果</p>
+<p><img src="/2019/08/03/NIO缓冲区（Buffer）的数据存储/clipboard.png" alt="img"></p>
+<p><br><br></p>
+<h2 id="只读Buffer"><a href="#只读Buffer" class="headerlink" title="只读Buffer"></a>只读Buffer</h2><p>我们可以随时将一个普通Buffer调用asReadOnlyBuffer方法返回一个只读Buffer，但不能将只读Buffer转换为一个读写Buffer</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer byteBuffer=ByteBuffer.allocate(<span class="number">10</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;byteBuffer.capacity();++i)&#123;</span><br><span class="line">    byteBuffer.put((<span class="keyword">byte</span>)i);</span><br><span class="line">&#125;</span><br><span class="line">ByteBuffer readonlyBuffer=byteBuffer.asReadOnlyBuffer();</span><br></pre></td></tr></table></figure>
+
+<p><br><br></p>
+<h2 id="直接缓冲区和非直接缓冲区"><a href="#直接缓冲区和非直接缓冲区" class="headerlink" title="直接缓冲区和非直接缓冲区"></a>直接缓冲区和非直接缓冲区</h2><p>非直接缓冲区：通过allocate() 方法分配缓冲区，将缓冲区建立在JVM的内存中。</p>
+<p>直接缓冲区：通过allocateDirect() 方法分配直接缓冲区，将缓冲区建立在操作系统的物理内存中，可以提高效率。</p>
+<p><strong>非直接缓冲区</strong></p>
+<p><img src="/2019/08/03/NIO缓冲区（Buffer）的数据存储/clipboard.png" alt="img"></p>
+<p><strong>直接缓冲区</strong></p>
+<p><img src="/2019/08/03/NIO缓冲区（Buffer）的数据存储/clipboard.png" alt="img"></p>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+          <a href="https://chenhuigg.github.io" target="_blank">关于转载请看这里</a>
+            <!--<a class="btn-pay"  href="#pay-modal">¥ 打赏支持</a>-->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          
+
+        </div>
+      </div>
+    </div>
+   
+</main>
+<div class="footer">
+  <div class="info">
+    <p>
+    
+    </p><p>&copy;2015-2019 陈辉的博客</p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = true;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
