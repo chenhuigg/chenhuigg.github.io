@@ -52,7 +52,7 @@
       </li>
       <li>
         
-    更新 <time datetime="2019-08-04T15:58:58.727Z" itemprop="dateUpdated">2019-08-04</time>
+    更新 <time datetime="2019-08-04T16:03:54.267Z" itemprop="dateUpdated">2019-08-05</time>
 
       </li>
       <li id="busuanzi_container_page_pv">
@@ -64,7 +64,39 @@
     <div class="article">
       <div class="content">
         
-        
+        <h2 id="通道"><a href="#通道" class="headerlink" title="通道"></a>通道</h2><p>由java.nio.channel包定义，Channel表示IO源与目标打开的连接。Channel类似于传统的“流”，只不过Channel本身不能直接访问数据，Channel只能与Buffer进行交互。</p>
+<p><br><br></p>
+<h2 id="通道的主要实现类"><a href="#通道的主要实现类" class="headerlink" title="通道的主要实现类"></a>通道的主要实现类</h2><p>|–FileChannel    本地通道</p>
+<p>|–SocketChannel    网络通道（TCP）</p>
+<p>|–ServerSocketChannel    网络通道（TCP）</p>
+<p>|–DatagramChannel    网络通道（UDP）</p>
+<p><br><br></p>
+<h2 id="获取通道的方式"><a href="#获取通道的方式" class="headerlink" title="获取通道的方式"></a>获取通道的方式</h2><p>1、java针对支持通道的类提供了getChannel（）方法获取通道</p>
+<p>​    本地IO：</p>
+<p>​    FileInputStream/FileOutputStream</p>
+<p>​    RandomAccessFile</p>
+<p>​    网络IO：</p>
+<p>​    Socket</p>
+<p>​    ServerSocket</p>
+<p>​    DatagramSocket</p>
+<p>2、在JDK 1.7中的NIO.2针对各个通道提供了静态方法open()获取通道</p>
+<p>3、在JDK 1.7中的NIO.2的Files工具类的newByteChannel()获取通道</p>
+<p><br><br></p>
+<p>##使用非直接缓冲区完成文件复制</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">FileInputStream fis=<span class="keyword">new</span> FileInputStream(<span class="string">"信息"</span>);</span><br><span class="line">FileOutputStream fos=<span class="keyword">new</span> FileOutputStream(<span class="string">"信息2"</span>);</span><br><span class="line"><span class="comment">//获取通道</span></span><br><span class="line">FileChannel inChannel = fis.getChannel();</span><br><span class="line">FileChannel outChannel = fos.getChannel();</span><br><span class="line"><span class="comment">//分配指定大小的缓冲区</span></span><br><span class="line">ByteBuffer byteBuffer=ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line"><span class="comment">//将通道中的数据存入缓冲区中</span></span><br><span class="line"><span class="keyword">while</span>((inChannel.read(byteBuffer))!=-<span class="number">1</span>) &#123;</span><br><span class="line">byteBuffer.flip();<span class="comment">//切换成读取数据模式</span></span><br><span class="line"><span class="comment">//将缓冲区中的数据写入通道</span></span><br><span class="line">outChannel.write(byteBuffer);</span><br><span class="line">byteBuffer.clear();<span class="comment">//清空缓冲区</span></span><br><span class="line">&#125;</span><br><span class="line">outChannel.close();</span><br><span class="line">inChannel.close();</span><br><span class="line">fos.close();</span><br><span class="line">fis.close();</span><br></pre></td></tr></table></figure>
+
+<p><br><br></p>
+<h2 id="使用直接缓冲区完成文件复制"><a href="#使用直接缓冲区完成文件复制" class="headerlink" title="使用直接缓冲区完成文件复制"></a>使用直接缓冲区完成文件复制</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">FileChannel inChannel = FileChannel.open(Paths.get(<span class="string">"信息"</span>), StandardOpenOption.READ);</span><br><span class="line">FileChannel outChannel=FileChannel.open(Paths.get(<span class="string">"信息3"</span>), StandardOpenOption.WRITE,StandardOpenOption.READ,StandardOpenOption.CREATE);</span><br><span class="line"><span class="comment">//内存映射文件</span></span><br><span class="line">MappedByteBuffer inMapBuffer = inChannel.map(MapMode.READ_ONLY, <span class="number">0</span>, inChannel.size());</span><br><span class="line">MappedByteBuffer outMapBuffer = outChannel.map(MapMode.READ_WRITE, <span class="number">0</span>, inChannel.size());</span><br><span class="line"><span class="comment">//直接对缓冲区进行数据的读写操作</span></span><br><span class="line"><span class="keyword">byte</span> [] by=<span class="keyword">new</span> <span class="keyword">byte</span>[inMapBuffer.limit()];</span><br><span class="line">inMapBuffer.get(by);</span><br><span class="line">outMapBuffer.put(by);</span><br><span class="line">inChannel.close();</span><br><span class="line">outChannel.close();</span><br></pre></td></tr></table></figure>
+
+<p><br><br></p>
+<h2 id="通道之间的数据传输"><a href="#通道之间的数据传输" class="headerlink" title="通道之间的数据传输"></a>通道之间的数据传输</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">FileChannel inChannel = FileChannel.open(Paths.get(<span class="string">"信息"</span>), StandardOpenOption.READ);</span><br><span class="line">FileChannel outChannel = FileChannel.open(Paths.get(<span class="string">"信息5"</span>),StandardOpenOption.WRITE,StandardOpenOption.CREATE);</span><br><span class="line"><span class="comment">//inChannel.transferTo(0, inChannel.size(), outChannel);</span></span><br><span class="line">outChannel.transferFrom(inChannel, <span class="number">0</span>, inChannel.size());</span><br><span class="line">inChannel.close();</span><br><span class="line">outChannel.close);</span><br></pre></td></tr></table></figure>
+
+<p><br><br></p>
+<h2 id="NIO分散读取和聚集写入"><a href="#NIO分散读取和聚集写入" class="headerlink" title="NIO分散读取和聚集写入"></a>NIO分散读取和聚集写入</h2><p>分散读取（Scatter Reads）：将通道中的数据分散到各个缓冲区中</p>
+<p>聚集写入（Gathering Writes）：将多个缓冲区中的数据聚集到通道中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//分散和聚集</span></span><br><span class="line">RandomAccessFile raf1=<span class="keyword">new</span> RandomAccessFile(<span class="string">"信息"</span>, <span class="string">"rw"</span>);</span><br><span class="line">RandomAccessFile raf2=<span class="keyword">new</span> RandomAccessFile(<span class="string">"信息6"</span>, <span class="string">"rw"</span>);</span><br><span class="line"><span class="comment">//获取通道</span></span><br><span class="line">FileChannel channel1 = raf1.getChannel();</span><br><span class="line">FileChannel channel2=raf2.getChannel();</span><br><span class="line"><span class="comment">//分配指定大小的缓冲区</span></span><br><span class="line">ByteBuffer byteBuffer=ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">ByteBuffer [] buffers= &#123;byteBuffer&#125;;</span><br><span class="line"><span class="comment">//分散读取</span></span><br><span class="line">channel1.read(buffers);</span><br><span class="line">byteBuffer.flip();</span><br><span class="line"><span class="comment">//聚集写入</span></span><br><span class="line">channel2.write(buffers);</span><br></pre></td></tr></table></figure>
+
+
       </div>
         <div class="support-author">
           <p>感谢您的阅读。 🙏
