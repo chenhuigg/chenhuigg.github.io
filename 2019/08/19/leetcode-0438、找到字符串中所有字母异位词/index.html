@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="陈辉的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/img/favicon.ico" title="Favicon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+	<title>leetcode-0438、找到字符串中所有字母异位词</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?awwssw1snsnsnn1ndndnndnd99j";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+	<svg id="nav-menu" class="icon icon-menu" aria-hidden="true">
+		<use xlink:href="#icon-menu"/>
+	</svg>
+  <a class="blog-title" href="/">陈辉的博客-填坑日记</a>
+  <a class="face-img" href="/">
+    <img src="https://tva3.sinaimg.cn/crop.0.0.200.200.180/005Kc3C1jw8f2uep0hhkvj305k05k3yk.jpg">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    leetcode-0438、找到字符串中所有字母异位词
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2019-08-19T15:17:17.000Z" itemprop="datePublished">2019-08-19</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-19T15:18:48.506Z" itemprop="dateUpdated">2019-08-19</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个字符串 s 和一个非空字符串 p，找到 s 中所有是 p 的字母异位词的子串，返回这些子串的起始索引。</p>
+<p>字符串只包含小写英文字母，并且字符串 s 和 p 的长度都不超过 20100。</p>
+<br>
+
+<p>说明：</p>
+<p>字母异位词指字母相同，但排列不同的字符串。</p>
+<p>不考虑答案输出的顺序。</p>
+<br>
+
+<p>示例 1:</p>
+<p>输入:</p>
+<p>s: “cbaebabacd” p: “abc”</p>
+<p>输出:</p>
+<p>[0, 6]</p>
+<p>解释:</p>
+<p>起始索引等于 0 的子串是 “cba”, 它是 “abc” 的字母异位词。</p>
+<p>起始索引等于 6 的子串是 “bac”, 它是 “abc” 的字母异位词。</p>
+<br>
+
+<p>示例 2:</p>
+<p>输入:</p>
+<p>s: “abab” p: “ab”</p>
+<p>输出:</p>
+<p>[0, 1, 2]</p>
+<p>解释:</p>
+<p>起始索引等于 0 的子串是 “ab”, 它是 “ab” 的字母异位词。</p>
+<p>起始索引等于 1 的子串是 “ba”, 它是 “ab” 的字母异位词。</p>
+<p>起始索引等于 2 的子串是 “ab”, 它是 “ab” 的字母异位词。</p>
+<p><br><br></p>
+<h2 id="思路分析"><a href="#思路分析" class="headerlink" title="思路分析"></a>思路分析</h2><p>首先，我们需要使用map对p串中的字母进行记录，然后遍历s串，使用left、right两个指针，先用right指针找到最大包含所有p串的子串，比较子串长度是否与p串相同，如果相同，就记录left，如果不同，移动left，直到子串不再包含所有的p串，这时，再移动right指针。</p>
+<p><br><br></p>
+<h2 id="代码描述"><a href="#代码描述" class="headerlink" title="代码描述"></a>代码描述</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findAnagrams</span><span class="params">(String s, String p)</span> </span>&#123;</span><br><span class="line">    	<span class="keyword">int</span> left=<span class="number">0</span>;</span><br><span class="line">    	<span class="keyword">int</span> right=<span class="number">0</span>;</span><br><span class="line">    	List&lt;Integer&gt; list=<span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    	<span class="comment">//遍历p，将其字母保存到map中</span></span><br><span class="line">    	HashMap&lt;Character, Integer&gt; map=<span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    	<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;p.length();i++)&#123;</span><br><span class="line">    		<span class="keyword">char</span> charAt = p.charAt(i);</span><br><span class="line">    		<span class="keyword">if</span>(map.get(charAt)==<span class="keyword">null</span>)&#123;</span><br><span class="line">    			map.put(charAt, <span class="number">1</span>);</span><br><span class="line">    		&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">				map.put(charAt, map.get(charAt)+<span class="number">1</span>);</span><br><span class="line">			&#125;</span><br><span class="line">    	&#125;</span><br><span class="line">    	<span class="comment">//遍历s</span></span><br><span class="line">    	<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;s.length();i++)&#123;</span><br><span class="line">    		<span class="keyword">char</span> charAt = s.charAt(i);</span><br><span class="line">    		<span class="comment">//map中存在</span></span><br><span class="line">    		<span class="keyword">if</span>(map.containsKey(charAt))&#123;</span><br><span class="line">    			map.put(charAt, map.get(charAt)-<span class="number">1</span>);</span><br><span class="line">    		&#125;</span><br><span class="line">    		<span class="comment">//是否全包含</span></span><br><span class="line">    		<span class="keyword">while</span>(containAll(map))&#123;</span><br><span class="line">    			right=i;</span><br><span class="line">    			<span class="keyword">if</span>(right-left+<span class="number">1</span>==p.length())&#123;</span><br><span class="line">    				list.add(left);</span><br><span class="line">    			&#125;</span><br><span class="line">    			<span class="comment">//left右移</span></span><br><span class="line">    			charAt=s.charAt(left);</span><br><span class="line">    			<span class="keyword">if</span>(map.containsKey(charAt))&#123;</span><br><span class="line">    				map.put(charAt, map.get(charAt)+<span class="number">1</span>);</span><br><span class="line">    			&#125;</span><br><span class="line">    			left++;</span><br><span class="line">    		&#125;</span><br><span class="line">    	&#125;</span><br><span class="line">		<span class="keyword">return</span> list;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">containAll</span><span class="params">(HashMap&lt;Character, Integer&gt;map)</span></span>&#123;</span><br><span class="line">    	<span class="keyword">for</span>(Integer integer:map.values())&#123;</span><br><span class="line">    		<span class="keyword">if</span>(integer&gt;<span class="number">0</span>)&#123;</span><br><span class="line">    			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    		&#125;</span><br><span class="line">    	&#125;</span><br><span class="line">    	<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+          <a href="https://chenhuigg.github.io" target="_blank">关于转载请看这里</a>
+            <!--<a class="btn-pay"  href="#pay-modal">¥ 打赏支持</a>-->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          
+
+        </div>
+      </div>
+    </div>
+   
+</main>
+<div class="footer">
+  <div class="info">
+    <p>
+    
+    </p><p>&copy;2015-2019 陈辉的博客</p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = true;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
